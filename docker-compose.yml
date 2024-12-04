@@ -9,6 +9,7 @@ services:
         environment:
             - PORT=3000
             - HOST=0.0.0.0
+            - DEBUG=1
         healthcheck:
             test:
                 [
@@ -23,7 +24,13 @@ services:
             retries: 3
             start_period: 5s
         networks:
-            - coolify-network
+            coolify-network:
+                aliases:
+                    - fastify-app
+        labels:
+            - coolify.network.name=i0ws4goo84gsw0c0s4oskkw8
+            - coolify.healthcheck.port=3000
+            - coolify.healthcheck.path=/health
 
 networks:
     coolify-network:

@@ -4,13 +4,26 @@ const fastify = require("fastify")({
         transport: {
             target: "pino-pretty",
         },
+        serializers: {
+            req(request) {
+                return {
+                    method: request.method,
+                    url: request.url,
+                    hostname: request.hostname,
+                    remoteAddress: request.ip,
+                    remotePort: request.socket.remotePort,
+                };
+            },
+        },
     },
     trustProxy: true,
 });
 
 // Log all incoming requests
 fastify.addHook("onRequest", (request, reply, done) => {
-    console.log(`Incoming request: ${request.method} ${request.url}`);
+    console.log(
+        `Incoming request from ${request.ip}: ${request.method} ${request.url}`
+    );
     done();
 });
 
@@ -27,10 +40,14 @@ fastify.get("/health", async (request, reply) => {
 const start = async () => {
     try {
         await fastify.listen({
-            port: 3000,
-            host: "0.0.0.0",
+            port: process.env.PORT || 3000,
+            host: process.env.HOST || "0.0.0.0",
         });
-        console.log("Server is ready to handle requests");
+        console.log(
+            `Server is ready on ${process.env.HOST || "0.0.0.0"}:${
+                process.env.PORT || 3000
+            }`
+        );
     } catch (err) {
         console.error("Error starting server:", err);
         process.exit(1);
