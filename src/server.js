@@ -1,27 +1,40 @@
 const fastify = require("fastify")({
-    logger: true,
+    logger: {
+        level: "debug",
+        transport: {
+            target: "pino-pretty",
+        },
+    },
+    trustProxy: true,
 });
 
-// Simple configuration without environment variables first
-fastify.listen(
-    {
-        port: 3000,
-        host: "0.0.0.0",
-    },
-    (err, address) => {
-        if (err) {
-            console.error("Error starting server:", err);
-            process.exit(1);
-        }
-        console.log(`Server is now listening on ${address}`);
-    }
-);
+// Log all incoming requests
+fastify.addHook("onRequest", (request, reply, done) => {
+    console.log(`Incoming request: ${request.method} ${request.url}`);
+    done();
+});
 
-// Routes
-fastify.get("/", async () => {
+fastify.get("/", async (request, reply) => {
+    console.log("Handling root request");
     return { hello: "world" };
 });
 
-fastify.get("/health", async () => {
+fastify.get("/health", async (request, reply) => {
+    console.log("Handling health check");
     return { status: "ok" };
 });
+
+const start = async () => {
+    try {
+        await fastify.listen({
+            port: 3000,
+            host: "0.0.0.0",
+        });
+        console.log("Server is ready to handle requests");
+    } catch (err) {
+        console.error("Error starting server:", err);
+        process.exit(1);
+    }
+};
+
+start();
