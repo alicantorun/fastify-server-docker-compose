@@ -6,6 +6,9 @@ services:
         ports:
             - "3000:3000"
         restart: unless-stopped
+        environment:
+            - PORT=3000
+            - HOST=0.0.0.0
         healthcheck:
             test:
                 [
@@ -19,7 +22,10 @@ services:
             timeout: 5s
             retries: 3
             start_period: 5s
-        labels:
-            - traefik.enable=true
-            - traefik.http.routers.fastify-app.rule=Host(`tgw4ow0g0gk88488g4wowc4c.18.193.128.202.sslip.io`)
-            - traefik.http.services.fastify-app.loadbalancer.server.port=3000
+        networks:
+            - coolify-network
+
+networks:
+    coolify-network:
+        external: true
+        name: i0ws4goo84gsw0c0s4oskkw8
