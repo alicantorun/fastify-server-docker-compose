@@ -1,29 +1,27 @@
-const fastify = require("fastify")({ logger: true });
+const fastify = require("fastify")({
+    logger: true,
+});
 
-const PORT = process.env.PORT || 3000;
-const HOST = process.env.HOST || "0.0.0.0";
+// Simple configuration without environment variables first
+fastify.listen(
+    {
+        port: 3000,
+        host: "0.0.0.0",
+    },
+    (err, address) => {
+        if (err) {
+            console.error("Error starting server:", err);
+            process.exit(1);
+        }
+        console.log(`Server is now listening on ${address}`);
+    }
+);
 
-// Route for GET '/'
-fastify.get("/", async (request, reply) => {
+// Routes
+fastify.get("/", async () => {
     return { hello: "world" };
 });
 
-// Add health check endpoint
-fastify.get("/health", async (request, reply) => {
+fastify.get("/health", async () => {
     return { status: "ok" };
 });
-
-// Start the server
-const start = async () => {
-    try {
-        await fastify.listen({
-            port: PORT,
-            host: HOST,
-        });
-    } catch (err) {
-        fastify.log.error(err);
-        process.exit(1);
-    }
-};
-
-start();
